@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEW - Plataforma de Trazabilidad de Residuos</title>
+    <style>
+        :root {
+            --color-primary: #2b7d6a;
+            --color-primary-hover: #1f5e52;
+            --color-primary-active: #184839;
+            --color-success: #27ae60;
+            --color-error: #e74c3c;
+            --color-warning: #f39c12;
+            --color-info: #3498db;
+            --color-bg: #f5f7fa;
+            --color-surface: #ffffff;
+            --color-text: #2c3e50;
+            --color-text-secondary: #7f8c8d;
+            --color-border: #e0e6ed;
+            --color-focus-ring: rgba(43, 125, 106, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #1f5e52 100%);
+            color: white;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--color-border);
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: var(--color-primary);
+        }
+
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        /* Content Panels */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Forms */
+        .form-section {
+            background: var(--color-surface);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--color-border);
+        }
+
+        .form-section h2 {
+            margin-bottom: 20px;
+            color: var(--color-primary);
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group.required label::after {
+            content: "*";
+            color: var(--color-error);
+            margin-left: 4px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-border);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d0d8e0;
+        }
+
+        .btn-success {
+            background-color: var(--color-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #229954;
+        }
+
+        .btn-danger {
+            background-color: var(--color-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* Table */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table th {
+            background-color: #f0f4f8;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-text);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        table input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .alert-info {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border-left: 4px solid var(--color-info);
+        }
+
+        .alert-success {
+            background-color: #d5f4e6;
+            color: #27ae60;
+            border-left: 4px solid var(--color-success);
+        }
+
+        .alert-error {
+            background-color: #fadbd8;
+            color: #c0392b;
+            border-left: 4px solid var(--color-error);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background-color: #d4eddb;
+            color: var(--color-primary);
+        }
+
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .tabs-container {
+                gap: 5px;
+            }
+
+            .tab-button {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success message */
+        .success-message {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Project type specific fields */
+        .project-type-field {
+            display: none;
+        }
+
+        .project-type-field.visible {
+            display: block;
+        }
+
+        /* Stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        /* Checkbox custom */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌱 TEW - Plataforma de Trazabilidad de Residuos</h1>
+            <p>Sistema integral de gestión de residuos de construcción y consumo de agua</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <button class="tab-button active" onclick="switchTab('registro')">Registro</button>
+            <button class="tab-button" onclick="switchTab('proyecto')">Detalle Proyecto</button>
+            <button class="tab-button" onclick="switchTab('estimacion')">Estimación</button>
+            <button class="tab-button" onclick="switchTab('gestores')">Matriz Gestores</button>
+            <button class="tab-button" onclick="switchTab('cuantificacion')">Cuantificación</button>
+            <button class="tab-button" onclick="switchTab('reporteria')">Reportería</button>
+        </div>
+
+        <!-- TAB 1: REGISTRO -->
+        <div id="registro" class="tab-content active">
+            <div class="form-section">
+                <h2>Registro de Empresa</h2>
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="rut">RUT Empresa</label>
+                        <input type="text" id="rut" placeholder="12.345.678-9">
+                    </div>
+                    <div class="form-group required">
+                        <label for="empresa">Nombre Empresa</label>
+                        <input type="text" id="empresa" placeholder="Nombre de la empresa">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" id="direccion" placeholder="Calle y número">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="region">Región</label>
+                        <select id="region">
+                            <option value="">Selecciona región</option>
+                            <option value="arica">Arica y Parinacota</option>
+                            <option value="tarapaca">Tarapacá</option>
+                            <option value="antofagasta">Antofagasta</option>
+                            <option value="atacama">Atacama</option>
+                            <option value="coquimbo">Coquimbo</option>
+                            <option value="valparaiso">Valparaíso</option>
+                            <option value="metropolitana">Metropolitana de Santiago</option>
+                            <option value="libertador">Libertador General Bernardo O'Higgins</option>
+                            <option value="maule">Maule</option>
+                            <option value="nuble">Ñuble</option>
+                            <option value="biobio">Biobío</option>
+                            <option value="araucania">Araucanía</option>
+                            <option value="rios">Los Ríos</option>
+                            <option value="lagos">Los Lagos</option>
+                            <option value="aysen">Aysén</option>
+                            <option value="magallanes">Magallanes</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label for="comuna">Comuna</label>
+                        <input type="text" id="comuna" placeholder="Comuna">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="telefono">Teléfono Contacto</label>
+                        <input type="tel" id="telefono" placeholder="+56 9 1234 5678">
+                    </div>
+                    <div class="form-group required">
+                        <label for="email">Correo</label>
+                        <input type="email" id="email" placeholder="contacto@empresa.cl">
+                    </div>
+                    <div class="form-group required">
+                        <label for="responsable">Nombre Responsable</label>
+                        <input type="text" id="responsable" placeholder="Nombre de la persona">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Datos Personales</h2>
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="nombre_completo">Nombre Completo</label>
+                        <input type="text" id="nombre_completo" placeholder="Nombre completo del usuario">
+                    </div>
+                    <div class="form-group required">
+                        <label for="email_usuario">Correo</label>
+                        <input type="email" id="email_usuario" placeholder="usuario@email.com">
+                    </div>
+                    <div class="form-group required">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" placeholder="Mínimo 8 caracteres">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveRegistro()">Guardar Registro</button>
+                <button class="btn btn-secondary" onclick="clearForm('registro')">Limpiar</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: DETALLE PROYECTO -->
+        <div id="proyecto" class="tab-content">
+            <div class="form-section">
+                <h2>Detalle de Proyecto</h2>
+                
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="codigo_proyecto">Código Identificación</label>
+                        <input type="text" id="codigo_proyecto" placeholder="Ej: PROY-001">
+                    </div>
+                    <div class="form-group required">
+                        <label for="nombre_proyecto">Nombre Proyecto</label>
+                        <input type="text" id="nombre_proyecto" placeholder="Nombre del proyecto">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="descripcion_proyecto">Descripción</label>
+                        <textarea id="descripcion_proyecto" placeholder="Descripción detallada del proyecto"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="responsable_proyecto">Responsable del Proyecto</label>
+                        <input type="text" id="responsable_proyecto" placeholder="Nombre del responsable">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="fecha_inicio">Fecha Inicio</label>
+                        <input type="date" id="fecha_inicio">
+                    </div>
+                    <div class="form-group required">
+                        <label for="fecha_termino">Fecha Término</label>
+                        <input type="date" id="fecha_termino">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="tipo_proyecto">Tipo de Proyecto</label>
+                        <select id="tipo_proyecto" onchange="updateProjectType()">
+                            <option value="">Selecciona tipo</option>
+                            <option value="obra">Obra</option>
+                            <option value="instalacion">Instalación</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label for="estado_proyecto">Estado</label>
+                        <select id="estado_proyecto">
+                            <option value="">Selecciona estado</option>
+                            <option value="planificacion">Planificación</option>
+                            <option value="ejecucion">Ejecución</option>
+                            <option value="cierre">Cierre</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="region_proyecto">Región</label>
+                        <select id="region_proyecto">
+                            <option value="">Selecciona región</option>
+                            <option value="metropolitana">Metropolitana de Santiago</option>
+                            <option value="valparaiso">Valparaíso</option>
+                            <option value="biobio">Biobío</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label for="comuna_proyecto">Comuna</label>
+                        <input type="text" id="comuna_proyecto" placeholder="Comuna">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveProyecto()">Guardar Proyecto</button>
+                <button class="btn btn-secondary" onclick="clearForm('proyecto')">Limpiar</button>
+            </div>
+        </div>
+
+        <!-- TAB 3: ESTIMACIÓN -->
+        <div id="estimacion" class="tab-content">
+            <div class="form-section">
+                <h2>Antecedentes Generales</h2>
+                
+                <div id="obra-fields" class="project-type-field">
+                    <h3>Datos de Obra</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="superficie">Superficie (m²)</label>
+                            <input type="number" id="superficie" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="presupuesto_rcd">Presupuesto RCD Total (CLP)</label>
+                            <input type="number" id="presupuesto_rcd" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="presupuesto_agua">Presupuesto Consumo Agua (CLP)</label>
+                            <input type="number" id="presupuesto_agua" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estimacion_personal">Estimación Personal</label>
+                            <input type="number" id="estimacion_personal" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="instalacion-fields" class="project-type-field">
+                    <h3>Datos de Instalación</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="presupuesto_rcd_inst">Presupuesto RCD Total (CLP)</label>
+                            <input type="number" id="presupuesto_rcd_inst" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="presupuesto_agua_inst">Presupuesto Consumo Agua (CLP)</label>
+                            <input type="number" id="presupuesto_agua_inst" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="estimacion_personal_inst">Estimación Personal</label>
+                            <input type="number" id="estimacion_personal_inst" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Factor Generación RCD</h2>
+                
+                <div id="factor-obra" class="project-type-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="factor_historico">Factor Generación Histórico</label>
+                            <input type="number" id="factor_historico" placeholder="kg/m²" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="factor_nacional">Factor Generación Nacional</label>
+                            <input type="number" id="factor_nacional" placeholder="kg/m²" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="factor-instalacion" class="project-type-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="generacion_m3">Generación m³ RCD (12 meses)</label>
+                            <input type="number" id="generacion_m3" placeholder="0" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Estimación de Residuos RCD</h2>
+                <div class="table-container">
+                    <table id="residuos-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo RCD</th>
+                                <th>% Generación</th>
+                                <th>Meta % Prevención</th>
+                                <th>Meta % Valorización</th>
+                                <th>Meta % Reutilización</th>
+                                <th>Descripción</th>
+                                <th>Valor Comercialización ($/m³)</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" placeholder="Ej: Hormigón"></td>
+                                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                <td><input type="text" placeholder="Descripción"></td>
+                                <td><input type="number" placeholder="0"></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">Eliminar</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-secondary" onclick="addResiduoRow()">+ Agregar Residuo</button>
+            </div>
+
+            <div class="form-section">
+                <h2>Estimación Consumo Agua</h2>
+                
+                <div id="agua-obra" class="project-type-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="factor_agua_historico">Factor Consumo Histórico (m³/m²)</label>
+                            <input type="number" id="factor_agua_historico" placeholder="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="factor_agua_nacional">Factor Consumo Nacional (m³/m²)</label>
+                            <input type="number" id="factor_agua_nacional" placeholder="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="agua-instalacion" class="project-type-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estimacion_agua_m3">Estimación m³ Agua/Año</label>
+                            <input type="number" id="estimacion_agua_m3" placeholder="0" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3>Actividades Consumo Agua</h3>
+                    <div class="table-container">
+                        <table id="agua-table">
+                            <thead>
+                                <tr>
+                                    <th>Actividad</th>
+                                    <th>% Consumo</th>
+                                    <th>Meta % Prevención</th>
+                                    <th>Meta % Reducción</th>
+                                    <th>Meta % Reutilización</th>
+                                    <th>Descripción</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" placeholder="Ej: Compactación"></td>
+                                    <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                    <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                    <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                    <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                    <td><input type="text" placeholder="Descripción"></td>
+                                    <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">Eliminar</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-secondary" onclick="addAguaRow()">+ Agregar Actividad</button>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveEstimacion()">Guardar y Enviar</button>
+                <button class="btn btn-secondary" onclick="clearForm('estimacion')">Limpiar</button>
+            </div>
+        </div>
+
+        <!-- TAB 4: MATRIZ GESTORES -->
+        <div id="gestores" class="tab-content">
+            <div class="alert alert-info">
+                <strong>ℹ️ Info:</strong> La identificación del gestor es importante para asociar los residuos a las empresas correctas según su tipo y ubicación.
+            </div>
+
+            <div class="form-section">
+                <h2>Listado de Gestores</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="filtro_region">Filtrar por Región</label>
+                        <select id="filtro_region" onchange="filterGestores()">
+                            <option value="">Todas las regiones</option>
+                            <option value="metropolitana">Metropolitana</option>
+                            <option value="valparaiso">Valparaíso</option>
+                            <option value="biobio">Biobío</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filtro_gestor">Filtrar por Gestor</label>
+                        <input type="text" id="filtro_gestor" placeholder="Nombre gestor" onkeyup="filterGestores()">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="gestores-tabla">
+                        <thead>
+                            <tr>
+                                <th>Nombre Gestor</th>
+                                <th>Región</th>
+                                <th>Tipo Gestión</th>
+                                <th>Contacto</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Eco Residuos Chile</td>
+                                <td>Metropolitana</td>
+                                <td>Valorización</td>
+                                <td>+56 2 1234 5678</td>
+                                <td><button class="btn btn-primary btn-sm" onclick="selectGestor(this)">Seleccionar</button></td>
+                            </tr>
+                            <tr>
+                                <td>Reciclajes Sur</td>
+                                <td>Valparaíso</td>
+                                <td>Disposición Final</td>
+                                <td>+56 32 123 4567</td>
+                                <td><button class="btn btn-primary btn-sm" onclick="selectGestor(this)">Seleccionar</button></td>
+                            </tr>
+                            <tr>
+                                <td>Construcción Verde</td>
+                                <td>Biobío</td>
+                                <td>Reutilización</td>
+                                <td>+56 41 123 4567</td>
+                                <td><button class="btn btn-primary btn-sm" onclick="selectGestor(this)">Seleccionar</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Selección Lugares de Destino</h2>
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="select_region">Región</label>
+                        <select id="select_region">
+                            <option value="">Selecciona región</option>
+                            <option value="metropolitana">Metropolitana</option>
+                            <option value="valparaiso">Valparaíso</option>
+                            <option value="biobio">Biobío</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label for="select_gestor">Gestor de Residuos</label>
+                        <select id="select_gestor">
+                            <option value="">Selecciona gestor</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label for="tipo_gestion">Tipo de Gestión</label>
+                        <select id="tipo_gestion">
+                            <option value="">Selecciona tipo</option>
+                            <option value="valorizacion">Valorización</option>
+                            <option value="disposicion">Disposición Final</option>
+                            <option value="reutilizacion">Reutilización</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="saveGestor()">Guardar</button>
+                    <button class="btn btn-secondary" onclick="addGestorNuevo()">+ Nuevo Gestor</button>
+                </div>
+            </div>
+
+            <div class="form-section" id="nuevo-gestor-section" style="display:none;">
+                <h2>Registrar Nuevo Gestor</h2>
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="nuevo_gestor_nombre">Nombre</label>
+                        <input type="text" id="nuevo_gestor_nombre" placeholder="Nombre gestor">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="nuevo_gestor_region">Región</label>
+                        <select id="nuevo_gestor_region">
+                            <option value="">Selecciona región</option>
+                            <option value="metropolitana">Metropolitana</option>
+                            <option value="valparaiso">Valparaíso</option>
+                            <option value="biobio">Biobío</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label for="nuevo_gestor_actividad">Actividad</label>
+                        <input type="text" id="nuevo_gestor_actividad" placeholder="Actividad principal">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="nuevo_gestor_contacto">Contacto</label>
+                        <input type="tel" id="nuevo_gestor_contacto" placeholder="+56 9 1234 5678">
+                    </div>
+                    <div class="form-group required">
+                        <label for="nuevo_gestor_direccion">Dirección</label>
+                        <input type="text" id="nuevo_gestor_direccion" placeholder="Dirección">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="nuevo_gestor_gestion">Tipo de Gestión</label>
+                        <select id="nuevo_gestor_gestion">
+                            <option value="">Selecciona tipo</option>
+                            <option value="valorizacion">Valorización</option>
+                            <option value="disposicion">Disposición Final</option>
+                            <option value="reutilizacion">Reutilización</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label for="nuevo_gestor_resolucion">Resolución Sanitaria</label>
+                        <input type="file" id="nuevo_gestor_resolucion">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="saveNuevoGestor()">Guardar y Esperar Validación</button>
+                    <button class="btn btn-secondary" onclick="cancelNuevoGestor()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: CUANTIFICACIÓN -->
+        <div id="cuantificacion" class="tab-content">
+            <div class="alert alert-info">
+                <strong>ℹ️ Info:</strong> Registro mensual de generación de residuos y consumo de agua para cumplir metas de sustentabilidad.
+            </div>
+
+            <div class="form-section">
+                <h2>Seleccionar Proyecto</h2>
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="select_proyecto_cuant">Proyecto</label>
+                        <select id="select_proyecto_cuant">
+                            <option value="">Selecciona proyecto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-secondary" onclick="agregarAnexo11()">+ Agregar Anexo 11</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Antecedentes Mensuales</h2>
+                
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="mes_cuant">Mes</label>
+                        <select id="mes_cuant">
+                            <option value="">Selecciona mes</option>
+                            <option value="01">Enero</option>
+                            <option value="02">Febrero</option>
+                            <option value="03">Marzo</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Mayo</option>
+                            <option value="06">Junio</option>
+                            <option value="07">Julio</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="form-group required">
+                        <label for="anio_cuant">Año</label>
+                        <input type="number" id="anio_cuant" placeholder="2025" min="2020" max="2050">
+                    </div>
+                </div>
+
+                <div id="cuant-obra-fields" class="project-type-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gastos_rcd_mes">Gastos RCD/Mes (CLP)</label>
+                            <input type="number" id="gastos_rcd_mes" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="estimacion_personal_mes">Estimación Personal</label>
+                            <input type="number" id="estimacion_personal_mes" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="avance_proyecto">% Avance Proyecto</label>
+                            <input type="number" id="avance_proyecto" placeholder="0" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cuant-instalacion-fields" class="project-type-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="m3_estimados">M³ Estimados</label>
+                            <input type="number" id="m3_estimados" placeholder="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="gastos_rcd_mes_inst">Gastos RCD/Mes (CLP)</label>
+                            <input type="number" id="gastos_rcd_mes_inst" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="estimacion_personal_mes_inst">Estimación Personal</label>
+                            <input type="number" id="estimacion_personal_mes_inst" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Cuantificación RCD por Residuo</h2>
+                <div class="table-container">
+                    <table id="cuant-residuos-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo RCD</th>
+                                <th>¿Se genera?</th>
+                                <th>Unidad</th>
+                                <th>Valor</th>
+                                <th>% Disposición</th>
+                                <th>% Valorización</th>
+                                <th>% Reutilización</th>
+                                <th>Tecnología Valorización</th>
+                                <th>Lugar Valorización</th>
+                                <th>Lugar Disposición Final</th>
+                                <th>Tipo Reutilización</th>
+                                <th>Lugar Reutilización</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" placeholder="Ej: Hormigón"></td>
+                                <td><select><option>Sí</option><option>No</option></select></td>
+                                <td><select><option>m³</option><option>kg</option><option>Ton</option></select></td>
+                                <td><input type="number" placeholder="0" step="0.1"></td>
+                                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                <td><input type="text" placeholder="Tecnología"></td>
+                                <td><input type="text" placeholder="Lugar"></td>
+                                <td><input type="text" placeholder="Lugar"></td>
+                                <td><input type="text" placeholder="Tipo"></td>
+                                <td><input type="text" placeholder="Lugar"></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-secondary" onclick="addCuantResiduoRow()">+ Agregar Residuo</button>
+            </div>
+
+            <div class="form-section">
+                <h2>Cuantificación Consumo Agua</h2>
+                
+                <div id="agua-cuant-obra" class="project-type-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gasto_agua_mes">Gasto Consumo Agua/Mes (m³)</label>
+                            <input type="number" id="gasto_agua_mes" placeholder="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="avance_agua_mes">% Avance Consumo Agua Mensual</label>
+                            <input type="number" id="avance_agua_mes" placeholder="0" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="agua-cuant-instalacion" class="project-type-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gasto_agua_mes_inst">Gasto Consumo Agua/Mes (m³)</label>
+                            <input type="number" id="gasto_agua_mes_inst" placeholder="0" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3>Actividades Consumo Agua</h3>
+                    <div class="table-container">
+                        <table id="cuant-agua-table">
+                            <thead>
+                                <tr>
+                                    <th>Actividad</th>
+                                    <th>¿Se genera?</th>
+                                    <th>Unidad</th>
+                                    <th>Valor</th>
+                                    <th>% Prevención</th>
+                                    <th>% Reducción</th>
+                                    <th>% Reutilización</th>
+                                    <th>Descripción</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" placeholder="Ej: Compactación"></td>
+                                    <td><select><option>Sí</option><option>No</option></select></td>
+                                    <td><select><option>m³</option><option>L</option></select></td>
+                                    <td><input type="number" placeholder="0" step="0.1"></td>
+                                    <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                    <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                    <td><input type="number" placeholder="%" min="0" max="100"></td>
+                                    <td><input type="text" placeholder="Descripción"></td>
+                                    <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-secondary" onclick="addCuantAguaRow()">+ Agregar Actividad</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Archivos de Respaldo Trazabilidad</h2>
+                <p style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 15px;">Certificados RETC, Recepción de RCD, Donación y Reutilización</p>
+                <div class="form-group">
+                    <label for="archivos_respaldo">Adjuntar Archivos</label>
+                    <input type="file" id="archivos_respaldo" multiple>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveCuantificacion()">Guardar</button>
+                <button class="btn btn-success" onclick="enviarCuantificacion()">Enviar y Cerrar</button>
+                <button class="btn btn-secondary" onclick="clearForm('cuantificacion')">Limpiar</button>
+            </div>
+        </div>
+
+        <!-- TAB 6: REPORTERÍA -->
+        <div id="reporteria" class="tab-content">
+            <div class="form-section">
+                <h2>Seleccionar Proyecto</h2>
+                <div class="form-row">
+                    <div class="form-group required">
+                        <label for="proyecto_reporteria">Obra o Instalación</label>
+                        <select id="proyecto_reporteria" onchange="loadReporteria()">
+                            <option value="">Selecciona proyecto</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Filtros de Reporte</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="anio_inicio">Año Inicio</label>
+                        <input type="number" id="anio_inicio" placeholder="2025" min="2020" max="2050">
+                    </div>
+                    <div class="form-group">
+                        <label for="anio_fin">Año Fin</label>
+                        <input type="number" id="anio_fin" placeholder="2025" min="2020" max="2050">
+                    </div>
+                    <div class="form-group">
+                        <label for="mes_inicio">Mes Inicio</label>
+                        <select id="mes_inicio">
+                            <option value="">Todos</option>
+                            <option value="01">Enero</option>
+                            <option value="02">Febrero</option>
+                            <option value="03">Marzo</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Mayo</option>
+                            <option value="06">Junio</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mes_fin">Mes Fin</label>
+                        <select id="mes_fin">
+                            <option value="">Todos</option>
+                            <option value="07">Julio</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="generarGraficos()">Ver Gráficos</button>
+                    <button class="btn btn-success" onclick="descargarExcel()">📊 Descargar Excel</button>
+                </div>
+            </div>
+
+            <div class="form-section" id="graficos-section" style="display:none;">
+                <h2>Resumen de Reportería</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total RCD Generado</h3>
+                        <div class="value" id="stat-rcd">0</div>
+                        <p style="font-size: 12px; color: var(--color-text-secondary);">m³</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Agua Consumida</h3>
+                        <div class="value" id="stat-agua">0</div>
+                        <p style="font-size: 12px; color: var(--color-text-secondary);">m³</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>% Valorización RCD</h3>
+                        <div class="value" id="stat-valorizacion">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>% Reutilización Agua</h3>
+                        <div class="value" id="stat-reutilizacion">0%</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Resumen Mensual</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Período</th>
+                                <th>RCD (m³)</th>
+                                <th>Agua (m³)</th>
+                                <th>% Valorización</th>
+                                <th>% Reutilización</th>
+                                <th>Costo RCD (CLP)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resumen-table">
+                            <tr>
+                                <td>Enero 2025</td>
+                                <td>250</td>
+                                <td>150</td>
+                                <td>65%</td>
+                                <td>25%</td>
+                                <td>$2,500,000</td>
+                            </tr>
+                            <tr>
+                                <td>Febrero 2025</td>
+                                <td>280</td>
+                                <td>165</td>
+                                <td>70%</td>
+                                <td>28%</td>
+                                <td>$2,800,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize app
+        const appData = {
+            registro: {},
+            proyecto: {},
+            estimacion: {},
+            gestores: [],
+            cuantificaciones: []
+        };
+
+        // Tab switching
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Project type change
+        function updateProjectType() {
+            const tipo = document.getElementById('tipo_proyecto').value;
+            const obraFields = document.querySelectorAll('#obra-fields, #factor-obra, #cuant-obra-fields, #agua-obra, #agua-cuant-obra');
+            const instalacionFields = document.querySelectorAll('#instalacion-fields, #factor-instalacion, #cuant-instalacion-fields, #agua-instalacion, #agua-cuant-instalacion');
+            
+            if (tipo === 'obra') {
+                obraFields.forEach(f => f.classList.add('visible'));
+                instalacionFields.forEach(f => f.classList.remove('visible'));
+            } else if (tipo === 'instalacion') {
+                instalacionFields.forEach(f => f.classList.add('visible'));
+                obraFields.forEach(f => f.classList.remove('visible'));
+            } else {
+                obraFields.forEach(f => f.classList.remove('visible'));
+                instalacionFields.forEach(f => f.classList.remove('visible'));
+            }
+        }
+
+        // Save functions
+        function saveRegistro() {
+            const rut = document.getElementById('rut').value;
+            const empresa = document.getElementById('empresa').value;
+            
+            if (!rut || !empresa) {
+                alert('⚠️ Por favor completa los campos requeridos');
+                return;
+            }
+            
+            appData.registro = {
+                rut,
+                empresa: document.getElementById('empresa').value,
+                direccion: document.getElementById('direccion').value,
+                region: document.getElementById('region').value,
+                comuna: document.getElementById('comuna').value,
+                telefono: document.getElementById('telefono').value,
+                email: document.getElementById('email').value,
+                responsable: document.getElementById('responsable').value,
+                nombre_completo: document.getElementById('nombre_completo').value,
+                email_usuario: document.getElementById('email_usuario').value
+            };
+            
+            showSuccess('✅ Registro guardado correctamente');
+        }
+
+        function saveProyecto() {
+            const codigo = document.getElementById('codigo_proyecto').value;
+            const nombre = document.getElementById('nombre_proyecto').value;
+            
+            if (!codigo || !nombre) {
+                alert('⚠️ Por favor completa los campos requeridos');
+                return;
+            }
+            
+            appData.proyecto = {
+                codigo: codigo,
+                nombre: nombre,
+                descripcion: document.getElementById('descripcion_proyecto').value,
+                responsable: document.getElementById('responsable_proyecto').value,
+                fecha_inicio: document.getElementById('fecha_inicio').value,
+                fecha_termino: document.getElementById('fecha_termino').value,
+                tipo: document.getElementById('tipo_proyecto').value,
+                estado: document.getElementById('estado_proyecto').value,
+                region: document.getElementById('region_proyecto').value,
+                comuna: document.getElementById('comuna_proyecto').value
+            };
+            
+            updateProjectType();
+            showSuccess('✅ Proyecto guardado correctamente');
+        }
+
+        function saveEstimacion() {
+            const residuos = document.querySelectorAll('#residuos-table tbody tr').length;
+            
+            if (residuos === 0) {
+                alert('⚠️ Debes agregar al menos un residuo');
+                return;
+            }
+            
+            showSuccess('✅ Estimación guardada correctamente');
+        }
+
+        function saveCuantificacion() {
+            const mes = document.getElementById('mes_cuant').value;
+            const anio = document.getElementById('anio_cuant').value;
+            
+            if (!mes || !anio) {
+                alert('⚠️ Por favor completa mes y año');
+                return;
+            }
+            
+            showSuccess('✅ Cuantificación guardada correctamente');
+        }
+
+        function enviarCuantificacion() {
+            if (appData.cuantificaciones.length === 0) {
+                showSuccess('✅ Cuantificación enviada y cerrada');
+            }
+        }
+
+        function saveGestor() {
+            const region = document.getElementById('select_region').value;
+            const gestor = document.getElementById('select_gestor').value;
+            const tipo = document.getElementById('tipo_gestion').value;
+            
+            if (!region || !gestor || !tipo) {
+                alert('⚠️ Por favor completa todos los campos');
+                return;
+            }
+            
+            appData.gestores.push({ region, gestor, tipo });
+            showSuccess('✅ Gestor asociado correctamente');
+        }
+
+        function saveNuevoGestor() {
+            const nombre = document.getElementById('nuevo_gestor_nombre').value;
+            const region = document.getElementById('nuevo_gestor_region').value;
+            
+            if (!nombre || !region) {
+                alert('⚠️ Por favor completa los campos requeridos');
+                return;
+            }
+            
+            showSuccess('✅ Gestor registrado. En espera de validación de CDT');
+            document.getElementById('nuevo-gestor-section').style.display = 'none';
+        }
+
+        // Table functions
+        function addResiduoRow() {
+            const table = document.getElementById('residuos-table').querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="Ej: Acero"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="text" placeholder="Descripción"></td>
+                <td><input type="number" placeholder="0"></td>
+                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">Eliminar</button></td>
+            `;
+            table.appendChild(newRow);
+        }
+
+        function addAguaRow() {
+            const table = document.getElementById('agua-table').querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="Ej: Riego"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="text" placeholder="Descripción"></td>
+                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">Eliminar</button></td>
+            `;
+            table.appendChild(newRow);
+        }
+
+        function addCuantResiduoRow() {
+            const table = document.getElementById('cuant-residuos-table').querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="Ej: Ladrillo"></td>
+                <td><select><option>Sí</option><option>No</option></select></td>
+                <td><select><option>m³</option><option>kg</option><option>Ton</option></select></td>
+                <td><input type="number" placeholder="0" step="0.1"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="text" placeholder="Tecnología"></td>
+                <td><input type="text" placeholder="Lugar"></td>
+                <td><input type="text" placeholder="Lugar"></td>
+                <td><input type="text" placeholder="Tipo"></td>
+                <td><input type="text" placeholder="Lugar"></td>
+                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
+            `;
+            table.appendChild(newRow);
+        }
+
+        function addCuantAguaRow() {
+            const table = document.getElementById('cuant-agua-table').querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="Ej: Limpieza"></td>
+                <td><select><option>Sí</option><option>No</option></select></td>
+                <td><select><option>m³</option><option>L</option></select></td>
+                <td><input type="number" placeholder="0" step="0.1"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="number" placeholder="%" min="0" max="100"></td>
+                <td><input type="text" placeholder="Descripción"></td>
+                <td><button class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
+            `;
+            table.appendChild(newRow);
+        }
+
+        function removeRow(btn) {
+            btn.parentElement.parentElement.remove();
+            showSuccess('✅ Fila eliminada');
+        }
+
+        // Gestor functions
+        function selectGestor(btn) {
+            showSuccess('✅ Gestor seleccionado');
+            btn.textContent = '✓ Seleccionado';
+            btn.disabled = true;
+        }
+
+        function addGestorNuevo() {
+            document.getElementById('nuevo-gestor-section').style.display = 'block';
+        }
+
+        function cancelNuevoGestor() {
+            document.getElementById('nuevo-gestor-section').style.display = 'none';
+        }
+
+        function filterGestores() {
+            const region = document.getElementById('filtro_region').value;
+            const gestor = document.getElementById('filtro_gestor').value.toLowerCase();
+            const rows = document.querySelectorAll('#gestores-tabla tbody tr');
+            
+            rows.forEach(row => {
+                const regionCell = row.cells[1].textContent.toLowerCase();
+                const gestorCell = row.cells[0].textContent.toLowerCase();
+                
+                const regionMatch = !region || regionCell.includes(region);
+                const gestorMatch = !gestor || gestorCell.includes(gestor);
+                
+                row.style.display = (regionMatch && gestorMatch) ? '' : 'none';
+            });
+        }
+
+        // Reporteria functions
+        function loadReporteria() {
+            showSuccess('✅ Proyecto cargado');
+        }
+
+        function generarGraficos() {
+            document.getElementById('graficos-section').style.display = 'block';
+            
+            const stat1 = Math.floor(Math.random() * 500) + 100;
+            const stat2 = Math.floor(Math.random() * 300) + 50;
+            const stat3 = Math.floor(Math.random() * 40) + 40;
+            const stat4 = Math.floor(Math.random() * 30) + 20;
+            
+            document.getElementById('stat-rcd').textContent = stat1;
+            document.getElementById('stat-agua').textContent = stat2;
+            document.getElementById('stat-valorizacion').textContent = stat3 + '%';
+            document.getElementById('stat-reutilizacion').textContent = stat4 + '%';
+            
+            showSuccess('✅ Gráficos generados');
+        }
+
+        function descargarExcel() {
+            const csvContent = 'Período,RCD (m³),Agua (m³),Valorización (%),Reutilización (%)\\nEnero 2025,250,150,65,25\\nFebrero 2025,280,165,70,28';
+            const link = document.createElement('a');
+            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+            link.download = 'TEW_Reporteria.csv';
+            link.click();
+            showSuccess('✅ Archivo descargado');
+        }
+
+        function agregarAnexo11() {
+            showSuccess('✅ Anexo 11 agregado');
+        }
+
+        // Utilities
+        function showSuccess(msg) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success success-message';
+            alert.textContent = msg;
+            document.querySelector('.container').insertBefore(alert, document.querySelector('.tabs-container'));
+            
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        function clearForm(tabName) {
+            const inputs = document.querySelectorAll(`#${tabName} input, #${tabName} select, #${tabName} textarea`);
+            inputs.forEach(input => {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+            showSuccess('✅ Formulario limpiado');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ TEW Platform inicializada correctamente');
+        });
+    </script>
+</body>
+</html>
